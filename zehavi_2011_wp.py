@@ -60,7 +60,7 @@ def zehavi_2011_wp(Mr_min = -18.0, Mr_max = -17.0, sample='all'):
         Mr_max = float(Mr_max)
         Mr_min = float(Mr_min)
         Mbin = (float(Mr_min),float(Mr_max))
-    threshold=False
+        threshold=False
     
     #get files for specified sample
     if (sample == 'all') & (not threshold):
