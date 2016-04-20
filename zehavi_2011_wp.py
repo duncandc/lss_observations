@@ -40,11 +40,11 @@ def zehavi_2011_wp(Mr_min = -18.0, Mr_max = -17.0, sample='all'):
     Returns
     -------
     measurement : numpy.ndarray
-        array of shape (2,14), where the first row is rp in :math:`h^-1` Mpc, and 
+        array of shape (2,13), where the first row is rp in :math:`h^-1` Mpc, and 
         the second row is wp in :math:`h^-1` Mpc.
     
     covariance : numpy.matrix
-        matrix of shape (14,14) of covariances between the ith and jth rp
+        matrix of shape (13,13) of covariances between the ith and jth rp
         measurments of wp 
     """
     
