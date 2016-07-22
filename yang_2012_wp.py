@@ -12,8 +12,6 @@ from astropy.io import ascii
 import os
 import numpy as np
 
-from observables_template import *
-
 __all__ = ['yang_2012_wp']
 __author__=['Duncan Campbell']
 
@@ -76,7 +74,6 @@ def yang_2012_wp(min_mstar=10**9.0, max_mstar=10**9.5, sample='Volume1'):
         msg = ("requested mass bin not available.")
         raise ValueError(msg)
     
-    
     #read in data
     filepath = os.path.dirname(__file__)
     filepath = os.path.join(filepath,'wp_measurements/yang_2012_data/')
@@ -91,7 +88,11 @@ def yang_2012_wp(min_mstar=10**9.0, max_mstar=10**9.5, sample='Volume1'):
     
     #create covariance matrix
     cov = np.array([cov_data[c] for c in cov_data.columns])
-    cov = cov
+    
+    N = len(wp)
+    for i in range(0,N):
+        for j in range(0,N):
+            cov[i,j] = wp[i]*wp[j]*cov[i,j]
     cov = np.matrix(cov)
     
     return measurement, cov

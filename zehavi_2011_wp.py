@@ -12,7 +12,6 @@ from astropy.io import ascii
 import os
 import numpy as np
 
-from observables_template import *
 
 __all__ = ['zehavi_2011_wp']
 __author__=['Duncan Campbell']
