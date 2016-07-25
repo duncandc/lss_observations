@@ -101,7 +101,7 @@ class Baldry_2011_phi(object):
     
     def __init__(self):
         
-        self.littleh = 1.0
+        self.littleh = 0.7
         
         #parameters from figure 13
         self.phi1 = 3.96*10**(-3)
@@ -150,6 +150,12 @@ class Baldry_2011_phi(object):
         self.data_table = Table(rows=data_rows,
             names=('bin_center', 'bin_width', 'phi', 'err', 'N'),
             dtype=('f4', 'f4', 'f4', 'f4', 'i4'))
+        
+        self.data_table['bin_center'] = 10**self.data_table['bin_center']
+        
+        self.data_table['bin_center'] = self.data_table['bin_center']*self.littleh**2
+        self.data_table['phi'] = self.data_table['phi']/self.littleh**3
+        self.data_table['err'] = self.data_table['err']/self.littleh**3
     
     def __call__(self, mstar):
         """
@@ -166,10 +172,14 @@ class Baldry_2011_phi(object):
             number density in units h^3 Mpc^-3 dex^-1
         """
         
+        #convert from h=1 to h=0.7
+        mstar = mstar / self.littleh**2
+        
         #take log of stellar masses
         mstar = np.log10(mstar)
         
-        return self.s(mstar)
+        #convert from h=0.7 to h=1.0
+        return self.s(mstar) / self.littleh**3
 
 
 class Yang_2012_phi(object):
