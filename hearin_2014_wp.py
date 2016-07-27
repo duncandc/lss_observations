@@ -3,7 +3,7 @@
 # April, 2016
 
 """
-projected two point correlation function measurements from Yang et al. 2012
+projected two point correlation function measurements from Hearin et al. 2014.
 """
 
 from __future__ import print_function, division
