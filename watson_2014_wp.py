@@ -3,7 +3,7 @@
 # April, 2016
 
 """
-projected two point correlation function measurements from Hearin et al. 2014.
+projected two point correlation function measurements from Watson et al. 2014.
 """
 
 from __future__ import print_function, division
@@ -12,14 +12,14 @@ from astropy.io import ascii
 import os
 import numpy as np
 
-__all__ = ['hearin_2014_wp']
+__all__ = ['watson_2014_wp']
 __author__=['Duncan Campbell']
 
-def hearin_2014_wp(mstar_thresh=10**9.49, sample='all'):
+def watson_2014_wp(mstar_thresh=10**9.49, sample='all'):
     """
     projected two point correlation function measurements from Hearin et al. 2014
     
-    http://arxiv.org/abs/1310.6747
+    http://arxiv.org/abs/1403.1578
     
     Parameters
     ----------
@@ -47,9 +47,9 @@ def hearin_2014_wp(mstar_thresh=10**9.49, sample='all'):
     if sample == 'all':
         filename = 'table_1.dat'
     elif sample == 'red':
-        filename = 'table_3.dat'
+        filename = 'table_A2.dat'
     elif sample == 'blue':
-        filename = 'table_2.dat'
+        filename = 'table_A1.dat'
     else:
         msg = ("sample not recognized.")
         raise ValueError(msg)
@@ -81,7 +81,7 @@ def hearin_2014_wp(mstar_thresh=10**9.49, sample='all'):
     
     #read in data
     filepath = os.path.dirname(__file__)
-    filepath = os.path.join(filepath,'wp_measurements/hearin_2014_data/')
+    filepath = os.path.join(filepath,'wp_measurements/watson_2014_data/')
     data = ascii.read(filepath+filename)
     
     rp = np.array(data.columns[0])
