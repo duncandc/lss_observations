@@ -13,10 +13,11 @@ from astropy.modeling.models import custom_model
 __all__ = ['LiWhite_2009_phi', 'Baldry_2011_phi', 'Yang_2012_phi','Tomczak_2014_phi']
 
 class LiWhite_2009_phi(object):
-    
-    def __init__(self):
+    """
+    stellar mass function from Li & White 2009, arXiv:0901.0706
+    """
+    def __init__(self, **kwargs):
         """
-        stellar mass function from Li & White 2009
         """
         
         self.publication = ['arXiv:0901.0706']
@@ -87,19 +88,11 @@ class LiWhite_2009_phi(object):
 class Baldry_2011_phi(object):
     """
     stellar mass function from Baldry et al. 2011, arXiv:1111.5707
-    
-    Parameters
-    ----------
-    mstar : array_like
-        stellar mass in units Msol/h^2
-    
-    Returns
-    -------
-    phi : nunpy.array
-        number density in units h^3 Mpc^-3 dex^-1
     """
     
-    def __init__(self):
+    def __init__(self, **kwargs):
+        """
+        """
         
         self.littleh = 0.7
         
@@ -185,19 +178,11 @@ class Baldry_2011_phi(object):
 class Yang_2012_phi(object):
     """
     stellar mass function from Yang et al. 2012, arXiv:1110.1420
-    
-    Parameters
-    ----------
-    mstar : array_like
-        stellar mass in units Msol/h^2
-    
-    Returns
-    -------
-    phi : nunpy.array
-        number density in units h^3 Mpc^-3 dex^-1
     """
     
-    def __init__(self):
+    def __init__(self, **kwargs):
+        """
+        """
         
         self.publication = ['arXiv:1110.1420']
         
@@ -284,26 +269,35 @@ class Yang_2012_phi(object):
 class Tomczak_2014_phi(object):
     """
     stellar mass function from Tomczak et al. 2014, arXiv:1309.5972
-    
-    Parameters
-    ----------
-    mstar : array_like
-        stellar mass in units Msol/h^2
-    
-    Returns
-    -------
-    phi : nunpy.array
-        number density in units h^3 Mpc^-3 dex^-1
     """
     
-    def __init__(self):
+    def __init__(self, **kwargs):
+        """
+        Parameters
+        ----------
+        redshift : float
+            default is 1.0
+        
+        type : string
+            default is 'all'
+        """
         
         self.publication = ['arXiv:1309.5972']
         
         self.littleh = 0.7
         
+        if 'redshift' in kwargs:
+            self.z = kwargs['redshift']
+        else:
+            self.z = 1.0
+        
+        if 'type' in kwargs:
+            self.type=kwargs['type']
+        else:
+            self.type = 'all'
+        
         #parameters table 2 all
-        self.z = np.array([0.2,0.5,0.75,1.0,1.25,1.5,2.0,2.5,2.5,3.0])
+        self.z_bins = np.array([0.2,0.5,0.75,1.0,1.25,1.5,2.0,2.5,2.5,3.0])
         self.phi1_all = 10**np.array([-2.54,-2.55,-2.56,-2.72,-2.78,-3.05,-3.80,-4.54])
         self.x1_all = np.array([10.78,10.70,10.66,10.54,10.61,10.74,10.69,10.74])
         self.alpha1_all = np.array([-0.98,-0.39,-0.37,0.30,-0.12,0.04,1.03,1.62])
@@ -352,7 +346,7 @@ class Tomczak_2014_phi(object):
             #create piecewise model
             self.s_q[i] = s1 + s2
     
-    def __call__(self, mstar, z=1.0, type='all'):
+    def __call__(self, mstar):
         """
         stellar mass function from Tomczak et al. 2014, arXiv:1309.5972
         
@@ -373,17 +367,19 @@ class Tomczak_2014_phi(object):
         #take log of stellar masses
         mstar = np.log10(mstar)
         
-        i = np.searchsorted(self.z,z)
+        i = np.searchsorted(self.z_bins,self.z)
         
         #convert from h=0.7 to h=1.0
-        if type=='all':
+        if self.type=='all':
             return self.s_all[i](mstar) / self.littleh**3
-        elif type=='star-forming':
+        elif self.type=='star-forming':
             return self.s_sf[i](mstar) / self.littleh**3
-        elif type=='quiescent':
+        elif self.type=='quiescent':
             return self.s_q[i](mstar) / self.littleh**3
         else:
             print('type not available')
+        
+        
 
 @custom_model
 def Log_Schechter(x, phi0=0.001, x0=10.5, alpha=-1.0):
