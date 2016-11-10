@@ -247,7 +247,7 @@ class Yang_2012_phi(object):
         
     def __call__(self, mstar):
         """
-        stellar mass function from Li & White 2009, arXiv:0901.0706
+        stellar mass function from Yang et al. 2012, arXiv:1110.1420
         
         Parameters
         ----------
