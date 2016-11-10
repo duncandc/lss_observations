@@ -10,7 +10,7 @@ import numpy as np
 from astropy.table import Table
 from astropy.modeling.models import custom_model
 
-__all__ = ['LiWhite_2009_phi', 'Baldry_2011_phi', 'Yang_2012_phi']
+__all__ = ['LiWhite_2009_phi', 'Baldry_2011_phi', 'Yang_2012_phi','Tomczak_2014_phi']
 
 class LiWhite_2009_phi(object):
     
@@ -280,6 +280,110 @@ class Yang_2012_phi(object):
         
         return self.s(mstar)
 
+
+class Tomczak_2014_phi(object):
+    """
+    stellar mass function from Tomczak et al. 2014, arXiv:1309.5972
+    
+    Parameters
+    ----------
+    mstar : array_like
+        stellar mass in units Msol/h^2
+    
+    Returns
+    -------
+    phi : nunpy.array
+        number density in units h^3 Mpc^-3 dex^-1
+    """
+    
+    def __init__(self):
+        
+        self.publication = ['arXiv:1309.5972']
+        
+        self.littleh = 0.7
+        
+        #parameters table 2 all
+        self.z = np.array([0.2,0.5,0.75,1.0,1.25,1.5,2.0,2.5,2.5,3.0])
+        self.phi1_all = 10**np.array([-2.54,-2.55,-2.56,-2.72,-2.78,-3.05,-3.80,-4.54])
+        self.x1_all = np.array([10.78,10.70,10.66,10.54,10.61,10.74,10.69,10.74])
+        self.alpha1_all = np.array([-0.98,-0.39,-0.37,0.30,-0.12,0.04,1.03,1.62])
+        self.phi2_all = 10**np.array([-4.29,-3.15,-3.39,-3.17,-3.43,-3.38,-3.26,-3.69])
+        self.x2_all = self.x1_all
+        self.alpha2_all = np.array([-1.90,-1.53,-1.61,-1.45,-1.56,-1.49,-1.33,-1.57])
+        
+        #parameters table 2 star-forming
+        self.phi1_sf = 10**np.array([-2.67,-2.97,-2.81,-2.98,-3.04,-3.37,-4.30,-4.95])
+        self.x1_sf = np.array([10.59,10.65,10.56,10.44,10.69,10.59,10.58,10.61])
+        self.alpha1_sf = np.array([-1.08,-0.97,-0.46,0.53,-0.55,0.75,2.06,2.36])
+        self.phi2_sf = 10**np.array([-4.46,-3.34,-3.36,-3.11,-3.59,-3.28,-3.28,-3.71])
+        self.x2_sf = self.x1_all
+        self.alpha2_sf = np.array([-2.00,-1.58,-1.61,-1.44,-1.62,-1.47,-1.38,-1.67])
+        
+        #parameters table 2 quiscent
+        self.phi1_q = 10**np.array([-2.76,-2.67,-2.81,-3.03,-3.36,-3.41,-3.59,-4.22])
+        self.x1_q = np.array([10.75,10.68,10.63,10.63,10.49,10.77,10.69,9.95])
+        self.alpha1_q = np.array([0.47,0.10,0.04,0.11,0.85,-0.19,0.37,0.62])
+        self.phi2_q = 10**np.array([-5.21,-4.29,-4.40,-4.80,-3.72,-3.91,-6.95,-4.51])
+        self.x2_q = self.x1_all
+        self.alpha2_q = np.array([-1.97,-1.69,-1.51,-1.57,-0.54,-0.18,-3.07,-2.51])
+        
+        self.s_all = np.empty((8,), dtype=object)
+        self.s_sf = np.empty((8,), dtype=object)
+        self.s_q = np.empty((8,), dtype=object)
+        
+        for i in range(0,8):
+            #define components of double Schechter function
+            s1 = Log_Schechter(phi0=self.phi1_all[i], x0=self.x1_all[i], alpha=self.alpha1_all[i])
+            s2 = Log_Schechter(phi0=self.phi2_all[i], x0=self.x2_all[i], alpha=self.alpha2_all[i])
+            #create piecewise model
+            self.s_all[i] = s1 + s2
+        
+        for i in range(0,8):
+            #define components of double Schechter function
+            s1 = Log_Schechter(phi0=self.phi1_sf[i], x0=self.x1_sf[i], alpha=self.alpha1_sf[i])
+            s2 = Log_Schechter(phi0=self.phi2_sf[i], x0=self.x2_sf[i], alpha=self.alpha2_sf[i])
+            #create piecewise model
+            self.s_sf[i] = s1 + s2
+        
+        for i in range(0,8):
+            #define components of double Schechter function
+            s1 = Log_Schechter(phi0=self.phi1_q[i], x0=self.x1_q[i], alpha=self.alpha1_q[i])
+            s2 = Log_Schechter(phi0=self.phi2_q[i], x0=self.x2_q[i], alpha=self.alpha2_q[i])
+            #create piecewise model
+            self.s_q[i] = s1 + s2
+    
+    def __call__(self, mstar, z=1.0, type='all'):
+        """
+        stellar mass function from Tomczak et al. 2014, arXiv:1309.5972
+        
+        Parameters
+        ----------
+        mstar : array_like
+            stellar mass in units Msol/h^2
+        
+        Returns
+        -------
+        phi : nunpy.array
+            number density in units h^3 Mpc^-3 dex^-1
+        """
+        
+        #convert from h=1 to h=0.7
+        mstar = mstar / self.littleh**2
+        
+        #take log of stellar masses
+        mstar = np.log10(mstar)
+        
+        i = np.searchsorted(self.z,z)
+        
+        #convert from h=0.7 to h=1.0
+        if type=='all':
+            return self.s_all[i](mstar) / self.littleh**3
+        elif type=='star-forming':
+            return self.s_sf[i](mstar) / self.littleh**3
+        elif type=='quiescent':
+            return self.s_q[i](mstar) / self.littleh**3
+        else:
+            print('type not available')
 
 @custom_model
 def Log_Schechter(x, phi0=0.001, x0=10.5, alpha=-1.0):
