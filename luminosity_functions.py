@@ -26,31 +26,31 @@ class Blanton_2003_phi(object):
 
         # parameters from table #2
         if band == 'u':
-            self.phi   = 3.05 * 10**(-2)
-            self.x     = -17.93
-            self.alpha = -0.92
+            self.phi0   = 3.05 * 10**(-2)
+            self.x0     = -17.93
+            self.alpha0 = -0.92
         elif band == 'g':
-            self.phi   = 2.18 * 10**(-2)
-            self.x     = -19.39
-            self.alpha = -0.89
+            self.phi0   = 2.18 * 10**(-2)
+            self.x0     = -19.39
+            self.alpha0 = -0.89
         elif band == 'r':
-            self.phi   = 1.49 * 10**(-2)
-            self.x     = -20.44
-            self.alpha = -1.05
+            self.phi0   = 1.49 * 10**(-2)
+            self.x0     = -20.44
+            self.alpha0 = -1.05
         elif band == 'i':
-            self.phi   = 1.47 * 10**(-2)
-            self.x     = -20.82
-            self.alpha = -1.00
+            self.phi0   = 1.47 * 10**(-2)
+            self.x0     = -20.82
+            self.alpha0 = -1.00
         elif band == 'z':
-            self.phi   = 1.35 * 10**(-2)
-            self.x     = -21.18
-            self.alpha = -1.08
+            self.phi0   = 1.35 * 10**(-2)
+            self.x0     = -21.18
+            self.alpha0 = -1.08
         else:
             msg = ('band not recognized.  `band` must be one of [u,g,r,i,z].')
             raise ValueError(msg)
 
         # define components of double Schechter function
-        s = Mag_Schechter(phi0=self.phi, x0=self.x, alpha=self.alpha)
+        s = Mag_Schechter(phi0=self.phi0, x0=self.x0, alpha=self.alpha0)
 
         # create model
         self.s = s
