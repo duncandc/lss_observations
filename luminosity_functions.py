@@ -8,9 +8,16 @@ from __future__ import (division, print_function, absolute_import, unicode_liter
 import numpy as np
 
 from astropy.table import Table
+from astropy.io import ascii
 from astropy.modeling.models import custom_model
 #from scipy.special import gammaincc, gammaincinv
 from mpmath import gammainc
+from astro_utils.schechter_functions import MagSchechter
+
+# set location of tabvulated data
+import os
+filepath = os.path.dirname(__file__)
+filepath = os.path.join(filepath,'phi_measurements/')
 
 __all__ = ['Blanton_2003_phi']
 
@@ -26,22 +33,37 @@ class Blanton_2003_phi(object):
 
         # parameters from table #2
         if band == 'u':
+            filename = 'lumfunc-u.sample10ubright15.dat'
+            col_names = ['absolute_magnitude', 'phi', 'sigma_phi']
+            self.data = ascii.read(filepath+filename, format='ascii', names=col_names)
             self.phi0   = 3.05 * 10**(-2)
             self.x0     = -17.93
             self.alpha0 = -0.92
         elif band == 'g':
+            filename = 'lumfunc-g.sample10gbright15.dat'
+            col_names = ['absolute_magnitude', 'phi', 'sigma_phi']
+            self.data = ascii.read(filepath+filename, format='ascii', names=col_names)
             self.phi0   = 2.18 * 10**(-2)
             self.x0     = -19.39
             self.alpha0 = -0.89
         elif band == 'r':
+            filename = 'lumfunc-r.sample10bbright15.dat'
+            col_names = ['absolute_magnitude', 'phi', 'sigma_phi']
+            self.data = ascii.read(filepath+filename, names=col_names)
             self.phi0   = 1.49 * 10**(-2)
             self.x0     = -20.44
             self.alpha0 = -1.05
         elif band == 'i':
+            filename = 'lumfunc-i.sample10ibright15.dat'
+            col_names = ['absolute_magnitude', 'phi', 'sigma_phi']
+            self.data = ascii.read(filepath+filename, format='ascii', names=col_names)
             self.phi0   = 1.47 * 10**(-2)
             self.x0     = -20.82
             self.alpha0 = -1.00
         elif band == 'z':
+            filename = 'lumfunc-z.sample10zbright15.dat'
+            col_names = ['absolute_magnitude', 'phi', 'sigma_phi']
+            self.data = ascii.read(filepath+filename, format='ascii', names=col_names)
             self.phi0   = 1.35 * 10**(-2)
             self.x0     = -21.18
             self.alpha0 = -1.08
@@ -50,7 +72,7 @@ class Blanton_2003_phi(object):
             raise ValueError(msg)
 
         # define components of double Schechter function
-        s = Mag_Schechter(phi0=self.phi0, x0=self.x0, alpha=self.alpha0)
+        s = MagSchechter(phi0=self.phi0, M0=self.x0, alpha=self.alpha0)
 
         # create model
         self.s = s
@@ -73,14 +95,8 @@ class Blanton_2003_phi(object):
 
         return self.s(mag)
 
+    def number_density(self, a, b):
+        """
+        """
+        return self.s.number_density(a,b)
 
-@custom_model
-def Mag_Schechter(x, phi0=0.001, x0=-20.0, alpha=-1.0):
-    """
-    log schecter x function
-    """
-    x = np.asarray(x)
-    x = x.astype(float)
-    norm = (2.0/5.0)*phi0*np.log(10.0)
-    val = norm*(10.0**(0.4*(x0-x)))**(alpha+1.0)*np.exp(-10.0**(0.4*(x0-x)))
-    return val
